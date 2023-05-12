@@ -1,6 +1,8 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 # All rights reserved.
 
+# the implement is based on the paper 'Three things everyone should know about Vision Transformers'
+
 import torch
 import torch.nn as nn
 from functools import partial
@@ -138,7 +140,9 @@ class Block_paralx2(nn.Module):
         x = x + self.drop_path(self.mlp(self.norm2(x))) + self.drop_path(self.mlp1(self.norm21(x)))
         return x
         
-        
+# Replace the linear patch projection by an MLP patch projection (see class hMLP_stem). 
+# A key advantage is that this pre-processing stem is compatible with and improves mask-based self-supervised training like BeiT.
+# From the paper 'Three things everyone should know about Vision Transformers'.
 class hMLP_stem(nn.Module):
     """ hMLP_stem: https://arxiv.org/pdf/2203.09795.pdf
     taken from https://github.com/rwightman/pytorch-image-models/blob/master/timm/models/vision_transformer.py
@@ -268,6 +272,10 @@ class vit_models(nn.Module):
 
 # DeiT III: Revenge of the ViT (https://arxiv.org/abs/2204.07118)
 
+# 这段代码定义了一个名为deit_tiny_patch16_LS的模型，使用的是vit_models函数创建的ViT模型，该模型包括以下参数：输入图像大小img_size、patch大小patch_size
+# 嵌入维度embed_dim、# 层数depth、注意力头数num_heads、mlp扩展比例mlp_ratio、qkv是否带有偏置qkv_bias、层归一化方式norm_layer、块的层数block_layers等。
+# @register_model是一个装饰器函数，它将模型注册到模型库中，可以在其他代码中使用模型名称调用这个模型。
+# 这个装饰器通常与其他模型构建函数一起使用，为用户提供了一种方便的方式来创建、配置和使用模型。
 @register_model
 def deit_tiny_patch16_LS(pretrained=False, img_size=224, pretrained_21k = False,   **kwargs):
     model = vit_models(
